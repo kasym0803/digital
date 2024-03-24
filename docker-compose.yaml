@@ -1,0 +1,24 @@
+version: "3"
+services:
+  django:
+    build: .
+    container_name: digital
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/usr/src/app/back-static
+    restart: always
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn HRDigitalForgeSoftware.wsgi:application --bind 0.0.0.0:8000"
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/usr/src/app/back-static
+    depends_on:
+      - django
+
+volumes:
+  static_volume:
